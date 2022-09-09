@@ -1,12 +1,6 @@
-from calendar import calendar
-from tkinter import *
 from tkinter import messagebox
 import csv
-from csv import reader
-import shutil
-from tempfile import NamedTemporaryFile
 from datetime import datetime, timedelta
-from modulos.funcoes import *
 
 
 def agendar(self):
@@ -20,16 +14,16 @@ def agendar(self):
     self.devolucao = f"{self.devolucao1} {self.devolucao_hora}"
     self.tecnico = self.tecnico_entry.get()
 
-    if (not self.codigo
-            or not self.descricao
-            or not self.retirada1
-            or not self.retirada_hora
-            or not self.retirada
-            or not self.devolucao_hora
-            or not self.devolucao1
-            or not self.devolucao
-            or not self.tecnico
-        ):
+    if not self.codigo \
+       or not self.descricao \
+       or not self.retirada1 \
+       or not self.retirada_hora \
+       or not self.retirada \
+       or not self.devolucao_hora \
+       or not self.devolucao1 \
+       or not self.devolucao \
+       or not self.tecnico:
+
         messagebox.showinfo(
             title="Atenção", message='Preencha todos os Campos')
         return
@@ -43,7 +37,7 @@ def agendar(self):
                 if item == self.codigo:
                     encontrado = True
                     ferramenta = definitiva
-        if encontrado == False:
+        if not encontrado:
             messagebox.showinfo(
                 title="Atenção", message='Código de ferramenta Inválido')
             return
@@ -57,7 +51,7 @@ def agendar(self):
             for item in definitiva:
                 if item == self.tecnico:
                     encontrado = True
-        if encontrado == False:
+        if not encontrado:
             messagebox.showinfo(
                 title="Atenção", message='Técnico não cadastrado')
             return
@@ -74,7 +68,9 @@ def agendar(self):
     tempo_agendamento = int(ferramenta[-3])
     if delta_devolucao > timedelta(hours=tempo_agendamento):
         messagebox.showinfo(
-            title='Atenção', message=f'Máximo de agendamento {tempo_agendamento}H')
+            title='Atenção',
+            message=f'Máximo de agendamento {tempo_agendamento}H'
+        )
         return
     if delta_devolucao <= timedelta(minutes=0):
         messagebox.showinfo(title='Atenção', message='Agendamento Inválido')
@@ -102,8 +98,15 @@ def agendar(self):
             fieldnames = ['codigo', 'descricao',
                           'retirada', 'devolucao', 'tecnico']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writerow({'codigo': self.codigo, 'descricao': self.descricao,
-                            'retirada': self.retirada, 'devolucao': self.devolucao, 'tecnico': self.tecnico})
+            writer.writerow(
+                {
+                    'codigo': self.codigo,
+                    'descricao': self.descricao,
+                    'retirada': self.retirada,
+                    'devolucao': self.devolucao,
+                    'tecnico': self.tecnico
+                }
+            )
 
         lines = list()
         members = ferramenta
@@ -137,8 +140,8 @@ def devolver(self):
         cpf_tecnico = valores[-1]
 
         with open('./arquivos/agenda.csv', 'r') as readFile:
-            reader = csv.reader(readFile)
-            for row in reader:
+            _reader = csv.reader(readFile)
+            for row in _reader:
                 lines.append(row)
                 e_fer_selecionada = False
                 for field in row:
@@ -150,8 +153,6 @@ def devolver(self):
         with open('./arquivos/agenda.csv', 'w', newline='') as writeFile:
             writer = csv.writer(writeFile)
             writer.writerows(lines)
-
-  # ----------------------------------
 
         lines2 = list()
         with open('./arquivos/ferramentas.csv', 'r') as readFile2:
@@ -172,7 +173,7 @@ def devolver(self):
         messagebox.showinfo(
             title="Atenção", message='Devolução realizada com sucesso')
 
-    except:
+    except IndexError:
         messagebox.showinfo(
             title="ERRO", message='Selecione um item a ser devolvido!')
         return
