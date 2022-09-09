@@ -1,13 +1,14 @@
-from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, Button, Frame, Label, Entry, Canvas, PhotoImage
 import tkinter as tk
-from frames.cadastro_ferramentas import *
-from frames.cadastro_tecnicos import *
-from frames.consulta_ferramentas import *
-from frames.consulta_tecnicos import *
-from frames.agenda import *
-from csv import writer
-
+from frames.cadastro_ferramentas import botao_cadastroF
+from frames.cadastro_tecnicos import botao_cadastroTec
+from frames.consulta_ferramentas import botao_consultaF
+from frames.consulta_tecnicos import botao_consultaTec
+from frames.agenda import botao_agenda, calendario
+from modulos.funcoes import (excluir, excluir_user, cadastrar_login, consultar,
+                             cadastrar_Tec, cadastrar_ferramentas)
+from modulos.funcoes_agenda import devolver, agendar
+from csv import reader
 
 THEME_COLOR = '#BBBFCA'
 
@@ -57,79 +58,95 @@ class Application:
 
     def frames_de_tela(self):
         self.frame_2 = Frame(self.root, bd=4, bg='#708090',
-                             highlightbackground='#0D0D0D', highlightthickness=0)
+                             highlightbackground='#0D0D0D',
+                             highlightthickness=0)
         self.frame_2.place(relx=0, rely=0.0, relwidth=0.23, relheight=1)
 
         self.frame_cadastroTec = Frame(
-            self.root, bd=4, highlightbackground='#878787', highlightthickness=0.5)
+            self.root, bd=4, highlightbackground='#878787',
+            highlightthickness=0.5)
         self.frame_cadastroTec.place(
             relx=0.23, rely=0.00, relwidth=0.77, relheight=1)
         self.frame_cadastroFer = Frame(
-            self.root, bd=4,  highlightbackground='#878787', highlightthickness=0.5)
+            self.root, bd=4,  highlightbackground='#878787',
+            highlightthickness=0.5)
         self.frame_cadastroFer.place(
             relx=0.23, rely=0.00, relwidth=0.77, relheight=1)
         self.frame_consultaFer = Frame(
-            self.root, bd=4, highlightbackground='#0D0D0D', highlightthickness=0)
+            self.root, bd=4, highlightbackground='#0D0D0D',
+            highlightthickness=0)
         self.frame_consultaFer.place(
             relx=0.23, rely=0.00, relwidth=0.77, relheight=1)
         self.frame_consultaTec = Frame(
-            self.root, bd=4, highlightbackground='#0D0D0D', highlightthickness=0)
+            self.root, bd=4, highlightbackground='#0D0D0D',
+            highlightthickness=0)
         self.frame_consultaTec.place(
             relx=0.23, rely=0.00, relwidth=0.77, relheight=1)
         self.frame_agenda = Frame(
-            self.root, bd=4,  highlightbackground='#0D0D0D', highlightthickness=0)
+            self.root, bd=4,  highlightbackground='#0D0D0D',
+            highlightthickness=0)
         self.frame_agenda.place(
             relx=0.23, rely=0.00, relwidth=0.77, relheight=1)
 
     def widgets_frame1(self):
         # Botão cadastar ferramentas
         self.bt_cadastroFer = Button(
-            self.frame_2, text=' Ferramentas', bg='#F2F2F2', command=lambda: self.botao_cadastroF(self))
+            self.frame_2, text=' Ferramentas', bg='#F2F2F2',
+            command=lambda: self.botao_cadastroF(self))
         self.bt_cadastroFer.place(
             relx=0.01, rely=0.1, relwidth=1, relheight=0.05)
         # Botão cadastrar tecnico
         self.bt_cadastroTec = Button(
-            self.frame_2, text='Técnicos', bg='#F2F2F2', command=lambda: self.botao_cadastroTec(self))
+            self.frame_2, text='Técnicos', bg='#F2F2F2',
+            command=lambda: self.botao_cadastroTec(self))
         self.bt_cadastroTec.place(
             relx=0.01, rely=0.152, relwidth=1, relheight=0.05)
         # Botão consulta Ferramenta
         self.bt_consultaFer = Button(
-            self.frame_2, text='Ferramentas', bg='#F2F2F2', command=lambda: self.botao_consultaF(self))
+            self.frame_2, text='Ferramentas', bg='#F2F2F2',
+            command=lambda: self.botao_consultaF(self))
         self.bt_consultaFer.place(
             relx=0.01, rely=0.30, relwidth=1, relheight=0.05)
         # Botão consultar Técnico
         self.bt_consultaTec = Button(
-            self.frame_2, text='Técnicos', bg='#F2F2F2', command=lambda: self.botao_consultaTec(self))
+            self.frame_2, text='Técnicos', bg='#F2F2F2',
+            command=lambda: self.botao_consultaTec(self))
         self.bt_consultaTec.place(
             relx=0.01, rely=0.353, relwidth=1, relheight=0.05)
         # Botão agenda
         self.bt_agenda = Button(
-            self.frame_2, text='Agenda', bg='#F2F2F2', command=lambda: self.botao_agenda(self))
+            self.frame_2, text='Agenda', bg='#F2F2F2',
+            command=lambda: self.botao_agenda(self))
         self.bt_agenda.place(
             relx=0.01, rely=0.5, relwidth=1, relheight=0.05)
         # Botão cadastrar usuário
         self.button_cadastrar = Button(
-            self.frame_2, text='Cadastrar Usuário', bg='#F2F2F2', command=lambda: self.cadastrar_login(self))
+            self.frame_2, text='Cadastrar Usuário', bg='#F2F2F2',
+            command=lambda: self.cadastrar_login(self))
         self.button_cadastrar.place(
             relx=0.09, rely=0.9, relwidth=0.75, relheight=0.042)
         # Botão Excluir Usuário
         self.button_excluir_usuario = Button(
-            self.frame_2, text='Excluir Usuário', bg='#F2F2F2', command=lambda: self.excluir_user(self))
+            self.frame_2, text='Excluir Usuário', bg='#F2F2F2',
+            command=lambda: self.excluir_user(self))
         self.button_excluir_usuario.place(
             relx=0.09, rely=0.95, relwidth=0.75, relheight=0.042)
         # texto cadastro
         self.lb_cadastro = Label(
-            self.frame_2, text='Cadastro', bg='#130633', foreground='white', font='fontStyle')
+            self.frame_2, text='Cadastro', bg='#130633',
+            foreground='white', font='fontStyle')
         self.lb_cadastro.place(relx=0.01, rely=0.05,
                                relwidth=1, relheight=0.05)
         # texto consulta
         self.lb_consulta = Label(
-            self.frame_2, text='Consulta', bg='#130633', foreground='white', font='fontStyle')
+            self.frame_2, text='Consulta', bg='#130633',
+            foreground='white', font='fontStyle')
         self.lb_consulta.place(relx=0.01, rely=0.25,
                                relwidth=1, relheight=0.05)
         # texto agenda
         self.lb_consulta = Label(
-            self.frame_2, text='Agenda', bg='#130633', foreground='white', font='fontStyle')
+            self.frame_2, text='Agenda', bg='#130633',
+            foreground='white', font='fontStyle')
         self.lb_consulta.place(relx=0.01, rely=0.45,
                                relwidth=1, relheight=0.05)
         # Texto cadastro login
@@ -190,7 +207,6 @@ class Window_login:
         with open('./arquivos/senha_entrada.csv', 'r') as csv_file:
             csv_reader = reader(csv_file)
             linhas = list(csv_reader)
-            elemento_lista = False
             msg = True
             for lista in linhas:
                 if self.user == lista[0]:
@@ -206,7 +222,8 @@ class Window_login:
                         msg2 = False
                 if msg2:
                     messagebox.showinfo(
-                        title="Atenção", message='Usuário e senha não confere!')
+                        title="Atenção",
+                        message='Usuário e senha não conferem!')
 
 
 root = tk.Tk()
